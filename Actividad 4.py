@@ -143,10 +143,8 @@ class Servicio(EntidadBase, ABC):
     def validar(self) -> bool:
         return self.disponible
 
+# Polimorfismo
 
-# ==========================================
-# 4. SERVICIOS ESPECIALIZADOS (POLIMORFISMO)
-# ==========================================
 class ServicioAlojamiento(Servicio):
     def __init__(self, id_entidad: str, nombre_servicio: str, costo_base: float, categoria_hotel: int, disponible: bool = True):
         super().__init__(id_entidad, nombre_servicio, costo_base, disponible)
@@ -159,7 +157,7 @@ class ServicioAlojamiento(Servicio):
         if not isinstance(noches, int) or noches <= 0:
             raise DatoInvalidoError("El número de noches debe ser un entero mayor a cero.")
 
-    # Sobrecarga simulada mediante argumentos opcionales (con impuestos y descuentos)
+    # Sobrecarga simulada mediante argumentos opcionales como los impuestos o descuentos
     def calcular_costo(self, noches: int, incluye_impuestos: bool = True, descuento_porcentaje: float = 0.0) -> float:
         self.validar_parametros(noches=noches)
         if descuento_porcentaje < 0 or descuento_porcentaje > 100:
@@ -227,10 +225,7 @@ class ServicioTour(Servicio):
     def describir(self) -> str:
         return f"Tour Guiado ({'Bilingüe' if self.guia_bilingue else 'Estándar'}) - {self.nombre_servicio}"
 
-
-# ==========================================
-# 5. CLASE RESERVA CON MANEJO AVANZADO
-# ==========================================
+# Clase Reserva con manejo avanzado
 class Reserva(EntidadBase):
     """Integra cliente, servicio, duración y estado con manejo de excepciones try/except/else/finally."""
     def __init__(self, id_entidad: str, cliente: Cliente, servicio: Servicio, detalles_calculo: dict):
@@ -238,7 +233,7 @@ class Reserva(EntidadBase):
         self.cliente = cliente
         self.servicio = servicio
         self.detalles_calculo = detalles_calculo
-        self.estado = "Pendiente" # Pendiente, Confirmada, Cancelada, Fallida
+        self.estado = "Pendiente" # Pendiente, Confirmada, Cancelada o Fallida
         self.costo_total = 0.0
 
     def validar(self) -> bool:
@@ -252,10 +247,10 @@ class Reserva(EntidadBase):
         """Procesa la reserva utilizando try/except/else/finally y encadenamiento de excepciones."""
         logging.info(f"Iniciando procesamiento de reserva ID: {self._id_entidad}")
         try:
-            # 1. Validaciones previas
+            # Validaciones previas
             self.validar()
 
-            # 2. Cálculo polimórfico del costo
+            # Cálculo polimorfismo del costo
             metodo = self.detalles_calculo.get('metodo_calculo', 'estandar')
             if isinstance(self.servicio, ServicioAlojamiento):
                 self.costo_total = self.servicio.calcular_costo(
@@ -307,14 +302,9 @@ class Reserva(EntidadBase):
         logging.info(f"Reserva {self._id_entidad} cancelada exitosamente.")
         print(f"-> [CANCELADA] La reserva {self._id_entidad} ha sido cancelada.")
 
-
-# ==========================================
-# 6. SIMULACIÓN DE 10 OPERACIONES COMPLETAS
-# ==========================================
+# Simulación de operaciones
 def ejecutar_simulacion():
-    print("==================================================")
     print(" INICIANDO SIMULACIÓN DE 10 OPERACIONES (SIN BD)")
-    print("==================================================\n")
 
     # Instanciamos servicios de prueba
     hotel = ServicioAlojamiento("SRV-01", "Hotel Gran Plaza", 150.0, 5, disponible=True)
@@ -322,16 +312,16 @@ def ejecutar_simulacion():
     tour = ServicioTour("SRV-03", "Tour Histórico Centro", 45.0, guia_bilingue=True, disponible=False) # No disponible a propósito
 
     operaciones = [
-        # Op 1: Cliente y reserva válidos (Alojamiento con descuento e impuestos)
+        # Op 1: Cliente y reserva válidos
         {"tipo": "reserva", "id": "RES-001", "cli": ("Carlos Pérez", "carlos@mail.com", "3001234567"), "srv": hotel, "detalles": {"noches": 3, "descuento": 10.0}},
         
-        # Op 2: Cliente con email inválido (Debe generar DatoInvalidoError)
+        # Op 2: Cliente con email inválido
         {"tipo": "reserva", "id": "RES-002", "cli": ("Ana Gómez", "correo-malo-sin-arroba", "3109876543"), "srv": transporte, "detalles": {"distancia_km": 15}},
         
-        # Op 3: Parámetro faltante en alojamiento (Falta 'noches')
+        # Op 3: Parámetro faltante en alojamiento
         {"tipo": "reserva", "id": "RES-003", "cli": ("Luis Torres", "luis@mail.com", "3201112233"), "srv": hotel, "detalles": {"descuento": 0.0}},
         
-        # Op 4: Servicio no disponible (Tour marcado como disponible=False)
+        # Op 4: Servicio no disponible
         {"tipo": "reserva", "id": "RES-004", "cli": ("Sofia Ruiz", "sofia@mail.com", "3154445566"), "srv": tour, "detalles": {"personas": 2}},
         
         # Op 5: Operación válida de Transporte Nocturno
@@ -340,7 +330,7 @@ def ejecutar_simulacion():
         # Op 6: Datos de teléfono inválidos en cliente
         {"tipo": "reserva", "id": "RES-006", "cli": ("Elena Gil", "elena@mail.com", "abc-telefono"), "srv": transporte, "detalles": {"distancia_km": 5}},
         
-        # Op 7: Operación válida de Tour (si activamos el servicio temporalmente)
+        # Op 7: Operación válida de Tour
         {"tipo": "reserva", "id": "RES-007", "cli": ("Roberto Sanchez", "roberto@mail.com", "3185556677"), "srv": tour, "detalles": {"activar_temporal": True, "personas": 4, "temporada_alta": True}},
         
         # Op 8: Cálculo inconsistente por valor negativo simulado en costo base
@@ -361,7 +351,7 @@ def ejecutar_simulacion():
                 if op['id'] == 'RES-007':
                     op['srv'].disponible = True
 
-                # Crear cliente (validación encapsulada)
+                # Crear cliente 
                 nombre, email, tel = op['cli']
                 cliente = Cliente(f"CLI-00{idx}", nombre, email, tel)
 
@@ -373,7 +363,6 @@ def ejecutar_simulacion():
                 # Buscamos simular una cancelación sobre un ID
                 if op['id'] == 'RES-001':
                     # Como RES-001 fue creada en el paso 1, la cancelamos directamente
-                    # (En un sistema real tendríamos un repositorio en memoria, aquí simulamos el objeto)
                     print(f"Cancelando reserva {op['id']} previamente creada...")
                     # Simulación de objeto reserva existente
                     cliente_dummy = Cliente("CLI-DUMMY", "Test", "test@mail.com", "3000000000")
@@ -390,9 +379,8 @@ def ejecutar_simulacion():
         
         time.sleep(0.2) # Pausa breve para legibilidad en consola
 
-    print("\n==================================================")
+    
     print(" SIMULACIÓN FINALIZADA. VER ARCHIVO 'sistema_reservas.log'")
-    print("==================================================")
 
 if __name__ == "__main__":
     ejecutar_simulacion()
