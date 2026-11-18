@@ -3,9 +3,8 @@ from datetime import datetime
 import logging
 import time
 
-# ==========================================
-# 1. CONFIGURACIÓN DEL SISTEMA DE LOGS
-# ==========================================
+# Configuración del sistema de logs
+
 logging.basicConfig(
     filename='sistema_reservas.log',
     level=logging.INFO,
@@ -13,9 +12,8 @@ logging.basicConfig(
     encoding='utf-8'
 )
 
-# ==========================================
-# 2. EXCEPCIONES PERSONALIZADAS Y ENCADENAMIENTO
-# ==========================================
+# Excepciones personalizadas ye ncadenamiento
+
 class SistemaError(Exception):
     """Excepción base para todos los errores del sistema."""
     pass
@@ -44,9 +42,8 @@ class CalculoInconsistenteError(SistemaError):
     """Se lanza cuando ocurre un error matemático o incongruencia en montos."""
     pass
 
-# ==========================================
-# 3. CLASES ABSTRACTAS Y ENTIDADES (POO)
-# ==========================================
+# Clases Abstractas t Entidades POO
+
 class EntidadBase(ABC):
     """Clase abstracta que representa entidades generales del sistema."""
     def __init__(self, id_entidad: str):
@@ -130,7 +127,7 @@ class Servicio(EntidadBase, ABC):
 
     @abstractmethod
     def calcular_costo(self, *args, **kwargs) -> float:
-        """Método polimórfico para calcular costo (soporta sobrecarga simulada)."""
+        """Método de polimorfismo para calcular costo."""
         pass
 
     @abstractmethod
